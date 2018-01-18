@@ -1,0 +1,9 @@
+.env
+*.log
+
+# ignore certificate files
+*.cer
+*.crt
+*.cert
+*.key
+*.pem
