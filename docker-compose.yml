@@ -32,7 +32,7 @@ services:
     #  - '3306:3306'
     volumes:
       - db:/var/lib/mysql
-      - ./conf/initdb.d:/docker-entrypoint-initdb.d
+      - ./conf/initdb.d:/docker-entrypoint-initdb.d:ro
     restart: unless-stopped
     env_file: .env
 
