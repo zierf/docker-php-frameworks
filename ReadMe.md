@@ -9,28 +9,28 @@ Simply call the script with any flags/parameters you would give the usual compos
 
 E. g. to show the current used composer version, append the `--version` flag.
 ```bash
-./composer.sh --version
+./bin/composer.sh --version
 ```
 
 
 ## Initialize new skeletons for popular frameworks
 Create a new skeleton for a **Symfony** application:
 ```bash
-./composer.sh create-project symfony/skeleton ./
+./bin/composer.sh create-project symfony/skeleton ./
 ```
 
 Create a new skeleton for a **Zend** application:
 ```bash
-./composer.sh create-project --stability="dev" zendframework/skeleton-application ./
+./bin/composer.sh create-project --stability="dev" zendframework/skeleton-application ./
 ```
 If you want to enable the developer toolbar while in *dev*-mode, make sure to answer with *y* to the questions
 "*Do you want a minimal install (no optional packages)?*" and "*Would you like to install the developer toolbar?*".
-Then choose to inject the *ZendDeveloperTools* into the file`config/development.config.php.dist` to keep it disabled later in production.
+Then choose to inject the *ZendDeveloperTools* into the file `config/development.config.php.dist` to keep it disabled later in production.
 Most other optional enabled modules should be injected into `config/modules.config.php`, so that they are available in both environments.
 
 Create a new skeleton for a **Zend Expressive** (minimalist *PSR-7* middleware) application:
 ```bash
-./composer.sh create-project zendframework/zend-expressive-skeleton ./
+./bin/composer.sh create-project zendframework/zend-expressive-skeleton ./
 ```
 For further information see [Zend Expressive](https://docs.zendframework.com/zend-expressive/) in official Zend documentation.
 
@@ -80,21 +80,21 @@ For further information (file extensions, execution order) see [Initializing a f
 
 
 ## Install and update modules
-Run the *composer* wrapper script with the `update` parameter to update your modules and dependencies to the highest allowed version according to the semver definitions in `/www/composer.json`.
+Run the `composer.sh` wrapper script with the `update` parameter to update your modules and dependencies to the highest allowed version according to the semver definitions in `/www/composer.json`.
 ```bash
-./composer.sh update
+./bin/composer.sh update
 ```
 This will ignore the exact specified versions in `/www/composer.lock` and update them afterwards with the new installed versions.
 
-Run the *composer* wrapper script with the `install` parameter to install your modules and dependencies with the exact version given in `/www/composer.lock`.
+Run the `composer.sh` wrapper script with the `install` parameter to install your modules and dependencies with the exact version given in `/www/composer.lock`.
 ```bash
-./composer.sh install
+./bin/composer.sh install
 ```
 If there isn't already an `/www/composer.lock`, it will act like an *update* and install the highest allowed version (within the semver definitions in `/www/composer.json`) and create a *.lock* file afterwards.
 
 Clear the composer cache.
 ```bash
-./composer.sh clear-cache
+./bin/composer.sh clear-cache
 ```
 
 
@@ -157,24 +157,24 @@ The `console-sf.sh` wrapper script allows to execute symfony commands as if you 
 
 ### Show Symfony version and environment.
 ```bash
-./console-sf.sh --version
+./bin/console-sf.sh --version
 ```
 
 ### Example to clear the development or production environment caches.
 ```bash
-./console-sf.sh cache:clear --no-warmup --env=dev
-./console-sf.sh cache:clear --no-warmup --env=prod
+./bin/console-sf.sh cache:clear --no-warmup --env=dev
+./bin/console-sf.sh cache:clear --no-warmup --env=prod
 ```
 
 ### Show a list of all routes
 ```bash
-./console-sf.sh debug:router
+./bin/console-sf.sh debug:router
 ```
 
 ### Install Doctrine ORM and update database
 Install *Doctrine ORM* in Symfony.
 ```bash
-./composer.sh require doctrine maker
+./bin/composer.sh require doctrine maker
 ```
 Follow the given instructions and modify the shown configuration files to connect to your database.
 The default hostname of the server is `db` (same as service-name defined in `/docker-compose.yml`).
@@ -182,14 +182,14 @@ Username, password and name of the database should match the *MYSQL_*… environ
 
 List available doctrine commands (e. g. create entities, update schema, create migrations).
 ```bash
-./console-sf.sh list doctrine
+./bin/console-sf.sh list doctrine
 ```
 Example to create/update/validate database schema.
 ```bash
-./console-sf.sh doctrine:schema:create
-./console-sf.sh doctrine:schema:update --force
-./console-sf.sh doctrine:schema:update --dump-sql
-./console-sf.sh doctrine:schema:validate
+./bin/console-sf.sh doctrine:schema:create
+./bin/console-sf.sh doctrine:schema:update --force
+./bin/console-sf.sh doctrine:schema:update --dump-sql
+./bin/console-sf.sh doctrine:schema:validate
 ```
 
 For further information see [Databases and the Doctrine ORM](https://symfony.com/doc/current/doctrine.html) in official Symfony documentation.
@@ -200,7 +200,7 @@ For further information see [Databases and the Doctrine ORM](https://symfony.com
 ### Install Doctrine ORM and update database
 Install *Doctrine ORM* in Zend.
 ```bash
-./composer.sh require doctrine/doctrine-orm-module
+./bin/composer.sh require doctrine/doctrine-orm-module
 ```
 Choose the `config/modules.config.php` as injected config file for the new modules.
 
@@ -252,20 +252,20 @@ same as in the *Doctrine ORM* section in Symfony.
 
 List available doctrine commands (e. g. create entities, update and validate schema).
 ```bash
-./doctrine-zf.sh list
+./bin/doctrine-zf.sh list
 ```
 
 Show basic information about all mapped entities.
 ```bash
-./doctrine-zf.sh orm:info
+./bin/doctrine-zf.sh orm:info
 ```
 
 Example to create/update/validate database schema.
 ```bash
-./doctrine-zf.sh orm:schema-tool:create
-./doctrine-zf.sh orm:schema-tool:update --force
-./doctrine-zf.sh orm:schema-tool:update --dump-sql
-./doctrine-zf.sh orm:validate-schema
+./bin/doctrine-zf.sh orm:schema-tool:create
+./bin/doctrine-zf.sh orm:schema-tool:update --force
+./bin/doctrine-zf.sh orm:schema-tool:update --dump-sql
+./bin/doctrine-zf.sh orm:validate-schema
 ```
 
 
@@ -274,15 +274,15 @@ The `command.sh` wrapper script allows to execute any commands inside the php co
 
 Call the Symfony console and bypass the `console-sf.sh` wrapper.
 ```bash
-./command.sh ./bin/console --version
-./command.sh ./bin/console list
-./command.sh ./bin/console list doctrine
+./bin/command.sh ./bin/console --version
+./bin/command.sh ./bin/console list
+./bin/command.sh ./bin/console list doctrine
 ```
 
 Call the Doctrine ORM module directly and bypass the `doctrine-zf.sh` wrapper.
 ```bash
-./command.sh ./vendor/bin/doctrine-module list
-./command.sh ./vendor/bin/doctrine-module orm:schema-tool:update --dump-sql
+./bin/command.sh ./vendor/bin/doctrine-module list
+./bin/command.sh ./vendor/bin/doctrine-module orm:schema-tool:update --dump-sql
 ```
 
 
