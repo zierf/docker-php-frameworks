@@ -36,13 +36,5 @@ services:
     restart: unless-stopped
     env_file: .env
 
-  adminer:
-    image: hardware/adminer
-    ports:
-      - '8008:8888'
-    depends_on:
-      - db
-    restart: unless-stopped
-
 volumes:
   db:
