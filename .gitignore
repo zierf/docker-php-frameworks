@@ -7,3 +7,5 @@
 *.cert
 *.key
 *.pem
+
+/www/
