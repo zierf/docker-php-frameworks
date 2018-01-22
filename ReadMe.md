@@ -2,6 +2,41 @@
 Foundation for a php project with composer support and SSL encryption.
 E. g. useful for Symfony or Zend applications.
 
+**Table of contents**
+<!-- TOC depthFrom:1 depthTo:6 withLinks:1 updateOnSave:1 orderedList:0 -->
+
+- [Docker-Compose Project with PHP Composer support](#docker-compose-project-with-php-composer-support)
+	- [Composer usage](#composer-usage)
+	- [Initialize new skeletons for popular frameworks](#initialize-new-skeletons-for-popular-frameworks)
+		- [Symfony 4](#symfony-4)
+		- [Zend Framework 3](#zend-framework-3)
+		- [Zend Expressive (PSR-7 middleware)](#zend-expressive-psr-7-middleware)
+	- [Nginx Webserver](#nginx-webserver)
+		- [Activate SSL](#activate-ssl)
+		- [Disable SSL / Usage behind a reverse proxy](#disable-ssl-usage-behind-a-reverse-proxy)
+		- [Disable IPv6](#disable-ipv6)
+	- [MariaDB Server (MySQL)](#mariadb-server-mysql)
+		- [Change MySQL passwords and database name](#change-mysql-passwords-and-database-name)
+		- [Initialize database with preset values](#initialize-database-with-preset-values)
+	- [Install and update modules](#install-and-update-modules)
+	- [Start and exit the application](#start-and-exit-the-application)
+- [remove only containers](#remove-only-containers)
+- [remove containers and their stored data](#remove-containers-and-their-stored-data)
+	- [Install PHP extensions](#install-php-extensions)
+	- [Log files](#log-files)
+	- [Useful commands](#useful-commands)
+		- [Open a shell directly in a running container.](#open-a-shell-directly-in-a-running-container)
+	- [Symfony](#symfony)
+		- [Install Symfony Debug Tools](#install-symfony-debug-tools)
+		- [Install Doctrine ORM and update database](#install-doctrine-orm-and-update-database)
+	- [Zend](#zend)
+		- [Install Zend Developer Toolbar](#install-zend-developer-toolbar)
+		- [Install Doctrine ORM and update database](#install-doctrine-orm-and-update-database)
+	- [Execute an arbitrary command in php container](#execute-an-arbitrary-command-in-php-container)
+	- [Notes](#notes)
+
+<!-- /TOC -->
+
 
 ## Composer usage
 The `composer.sh` script in the project root is a wrapper for running composer within the `/www` subdirectory.
