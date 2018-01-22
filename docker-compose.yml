@@ -21,7 +21,18 @@ services:
   php:
     build:
       context: ./php-fpm
-    image: zier/php-composer:7-fpm-alpine
+      args:
+        TZ: "Europe/Berlin"
+        INTL: "de_DE"
+        #HTTP_PROXY:  "http://proxy.domain.tld:8080"
+        #HTTPS_PROXY: "https://proxy.domain.tld:4443"
+        #FTP_PROXY:   "ftp://proxy.domain.tld:2121"
+        #NO_PROXY:    "localhost,127.0.0.1,.domain.local"
+        #HTTP_PROXY_REQUEST_FULLURI:  "false"
+        #HTTPS_PROXY_REQUEST_FULLURI: "false"
+    image: zierf/php:7-fpm-alpine
+    #ports:
+    #  - '9004:9004'
     volumes:
       - ./www:/usr/share/nginx/html:rw
     restart: unless-stopped
