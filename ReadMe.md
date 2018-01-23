@@ -3,48 +3,71 @@ Foundation for a php project with composer support and SSL encryption.
 E. g. useful for Symfony or Zend applications.
 
 **Table of contents**
-<!-- TOC depthFrom:1 depthTo:6 withLinks:1 updateOnSave:1 orderedList:0 -->
+<!-- TOC depthFrom:2 depthTo:4 withLinks:1 updateOnSave:1 orderedList:0 -->
 
-- [Docker-Compose Project with PHP Composer support](#docker-compose-project-with-php-composer-support)
-	- [Composer usage](#composer-usage)
-	- [Initialize new skeletons for popular frameworks](#initialize-new-skeletons-for-popular-frameworks)
-		- [Symfony 4](#symfony-4)
-		- [Zend Framework 3](#zend-framework-3)
-		- [Zend Expressive (PSR-7 middleware)](#zend-expressive-psr-7-middleware)
-	- [Nginx Webserver](#nginx-webserver)
-		- [Activate SSL](#activate-ssl)
-		- [Disable SSL / Usage behind a reverse proxy](#disable-ssl-usage-behind-a-reverse-proxy)
-		- [Disable IPv6](#disable-ipv6)
-	- [MariaDB Server (MySQL)](#mariadb-server-mysql)
-		- [Change MySQL passwords and database name](#change-mysql-passwords-and-database-name)
-		- [Initialize database with preset values](#initialize-database-with-preset-values)
-	- [Install and update modules](#install-and-update-modules)
-	- [Start and exit the application](#start-and-exit-the-application)
-- [remove only containers](#remove-only-containers)
-- [remove containers and their stored data](#remove-containers-and-their-stored-data)
-	- [Install PHP extensions](#install-php-extensions)
+- [Composer usage](#composer-usage)
+	- [Composer wrapper script](#composer-wrapper-script)
+	- [Install/Update php modules](#installupdate-php-modules)
+- [Initialize new skeletons for popular frameworks](#initialize-new-skeletons-for-popular-frameworks)
+	- [Symfony 4](#symfony-4)
+	- [Zend Framework 3](#zend-framework-3)
+	- [Zend Expressive](#zend-expressive)
+- [Start and exit the application](#start-and-exit-the-application)
+- [Sending Commands](#sending-commands)
+	- [Useful docker commands](#useful-docker-commands)
+	- [Execute arbitrary commands in PHP container](#execute-arbitrary-commands-in-php-container)
+- [PHP extensions](#php-extensions)
+- [Nginx Webserver](#nginx-webserver)
+	- [Activate SSL](#activate-ssl)
+	- [Disable SSL / Behind a reverse proxy](#disable-ssl-behind-a-reverse-proxy)
+	- [Disable IPv6](#disable-ipv6)
 	- [Log files](#log-files)
-	- [Useful commands](#useful-commands)
-		- [Open a shell directly in a running container.](#open-a-shell-directly-in-a-running-container)
-	- [Symfony](#symfony)
-		- [Install Symfony Debug Tools](#install-symfony-debug-tools)
-		- [Install Doctrine ORM and update database](#install-doctrine-orm-and-update-database)
-	- [Zend](#zend)
-		- [Install Zend Developer Toolbar](#install-zend-developer-toolbar)
-		- [Install Doctrine ORM and update database](#install-doctrine-orm-and-update-database)
-	- [Execute an arbitrary command in php container](#execute-an-arbitrary-command-in-php-container)
-	- [Notes](#notes)
+- [MariaDB Server (MySQL)](#mariadb-server-mysql)
+	- [Change MySQL passwords and database name](#change-mysql-passwords-and-database-name)
+	- [Initialize database with preset values](#initialize-database-with-preset-values)
+- [Symfony](#symfony)
+	- [Symfony console wrapper script](#symfony-console-wrapper-script)
+	- [Install Symfony Debug Tools](#install-symfony-debug-tools)
+	- [Install Doctrine ORM and update database](#install-doctrine-orm-and-update-database)
+- [Zend](#zend)
+	- [Install Zend Developer Toolbar](#install-zend-developer-toolbar)
+	- [Install Doctrine ORM and update database](#install-doctrine-orm-and-update-database)
+	- [Zend doctrine-module wrapper](#zend-doctrine-module-wrapper)
+- [Notes](#notes)
 
 <!-- /TOC -->
 
 
 ## Composer usage
+
+### Composer wrapper script
 The `composer.sh` script in the project root is a wrapper for running composer within the `/www` subdirectory.
 Simply call the script with any flags/parameters you would give the usual composer command and they will be handed over.
 
 E. g. to show the current used composer version, append the `--version` flag.
 ```bash
 ./bin/composer.sh --version
+```
+
+### Install/Update php modules
+Run the `composer.sh` wrapper script with the `update` parameter to update your modules and dependencies to
+the highest allowed version according to the [semver](https://semver.org/) definitions in `/www/composer.json`.
+```bash
+./bin/composer.sh update
+```
+This will ignore the exact specified versions in `/www/composer.lock` and update them afterwards with the new installed versions.
+
+Run the `composer.sh` wrapper script with the `install` parameter to install your modules and dependencies with
+the exact version given in `/www/composer.lock`.
+```bash
+./bin/composer.sh install
+```
+If there isn't already an `/www/composer.lock`, it will act like an *update* and install the highest allowed version
+(within the [semver](https://semver.org/) definitions in `/www/composer.json`) and create a *.lock* file afterwards.
+
+Clear the composer cache.
+```bash
+./bin/composer.sh clear-cache
 ```
 
 
@@ -92,82 +115,22 @@ Create a new skeleton for a **Zend** application:
 ```bash
 ./bin/composer.sh create-project --stability="dev" zendframework/skeleton-application ./
 ```
-If you want to enable the developer toolbar immediately while in *dev*-mode, make sure to answer with `n` to the first question
-"*Do you want a minimal install (no optional packages)?*" and with `y` to the following question "*Would you like to install the developer toolbar?*".
-Then choose to inject the *ZendDeveloperTools* into the file `config/development.config.php.dist` to keep them disabled later in production.
+If you want to enable the developer toolbar immediately while in *dev*-mode, make sure to answer with `n`
+to the first question "*Do you want a minimal install (no optional packages)?*" and with `y` to the following question
+"*Would you like to install the developer toolbar?*".
+Then choose to inject the *ZendDeveloperTools* into the file `config/development.config.php.dist`
+to keep them disabled later in production.
 
-Most other optional enabled modules should be injected into `config/modules.config.php`, so that they are available in both environments.
+Most other optional enabled modules should be injected into `config/modules.config.php`,
+so that they are available in both environments.
 
-### Zend Expressive (PSR-7 middleware)
+### Zend Expressive
 Create a new skeleton for a **Zend Expressive** (minimalist *PSR-7* middleware) application:
 ```bash
 ./bin/composer.sh create-project zendframework/zend-expressive-skeleton ./
 ```
-For further information see [Zend Expressive](https://docs.zendframework.com/zend-expressive/) in official Zend documentation.
-
-
-## Nginx Webserver
-
-Depending on whether you want to use SSL encryption, it's necessary to put the certificate and matching private key in the proper places.
-Also Consider to disable SSL encryption if you use the application behind a reverse proxy and let the proxy handle it.
-
-### Activate SSL
-In order to have an active encryption, copy your certificate file into the path `/conf/ssl/certs/nginx.crt`.
-The private key file should be copied to `/conf/ssl/private/nginx.key`.
-
-In case the filenames shouldn't be changed to nginx.*ext* or the file extensions is something else (e. g. *.pem*), it's needed to adjust the paths following paths in the `/conf/nginx.conf`:
-```
-    ssl_certificate     /etc/ssl/certs/nginx.crt;
-    ssl_certificate_key /etc/ssl/private/nginx.key;
-```
-
-### Disable SSL / Usage behind a reverse proxy
-Disabling SSL can be done by removing the first server block in `/conf/conf.d/vhost.conf` and changing the listen directives in the second one.
-```
-    listen        443 ssl http2 default_server;
-    listen   [::]:443 ssl http2 default_server ipv6only=on;
-```
-… will be replaced by …
-```
-    listen      80 default_server;
-    listen [::]:80 default_server ipv6only=on;
-```
-
-
-### Disable IPv6
-Simply remove the lines beginning with `listen [::]:…` in the `/conf/conf.d/vhost.conf` file.
-
-
-## MariaDB Server (MySQL)
-
-### Change MySQL passwords and database name
-There are some *MYSQL_*… environment variables to provide an initial database name, root password and username/password.
-You could provide them in the `.env` file in the project root, they will be handed over to the MariaDB container.
-For further information (available variables, alternative secrets file) see [Environment Variables / Docker Secrets](https://hub.docker.com/_/mariadb/) sections in the official MariaDB documentation on DockerHub.
-
-### Initialize database with preset values
-It's possible to put some *.sql* scripts into the `/conf/initdb.d/` directory.
-This way initial database structures or existing dumps can be loaded.
-For further information (file extensions, execution order) see [Initializing a fresh instance](https://hub.docker.com/_/mariadb/) section in the official MariaDB documentation on DockerHub.
-
-
-## Install and update modules
-Run the `composer.sh` wrapper script with the `update` parameter to update your modules and dependencies to the highest allowed version according to the [semver](https://semver.org/) definitions in `/www/composer.json`.
-```bash
-./bin/composer.sh update
-```
-This will ignore the exact specified versions in `/www/composer.lock` and update them afterwards with the new installed versions.
-
-Run the `composer.sh` wrapper script with the `install` parameter to install your modules and dependencies with the exact version given in `/www/composer.lock`.
-```bash
-./bin/composer.sh install
-```
-If there isn't already an `/www/composer.lock`, it will act like an *update* and install the highest allowed version (within the [semver](https://semver.org/) definitions in `/www/composer.json`) and create a *.lock* file afterwards.
-
-Clear the composer cache.
-```bash
-./bin/composer.sh clear-cache
-```
+For further information see [Zend Expressive](https://docs.zendframework.com/zend-expressive/)
+in official Zend documentation.
 
 
 ## Start and exit the application
@@ -192,53 +155,148 @@ docker-compose down -v
 ```
 **Warning:** Usage of the parameter *-v* removes volumes and therefore stored data within them.
 Don't use it, if you want to keep created and filled databases.
-But it can be useful for cleaning the workspace, if you want to reset some test data and recreate your structure with SQL imports or Doctrine.
+But it can be useful for cleaning the workspace, if you want to reset some test data
+and recreate your structure with SQL imports or Doctrine.
 
 
-## Install PHP extensions
-The *mysqli* and *pdo_mysql* extensions are already installed.
-If you need some more (e. g. a module requires them), you can add them in the `/php-fpm/Dockerfile` and rebuild the *php* container with following command:
-```bash
-docker-compose build php
-```
-For further information see [How to install more PHP extensions](https://hub.docker.com/_/php/) and following sections in the official PHP documentation on DockerHub.
+## Sending Commands
+Interacting with containers can be done by using the right `docker` and `docker-compose` commands
+as well as using some useful wrapper scripts located in `/bin` subdirectory.
 
+### Useful docker commands
 
-## Log files
-An `access.log` and `error.log` can be found in the `/logs/` subfolder after a successfully start of the application (and some requests).
-
-
-## Useful commands
-
-### Open a shell directly in a running container.
-Open a shell in php or nginx container.
+Open a shell directly in a running php or nginx container:
 ```bash
 docker-compose exec php /bin/ash
 docker-compose exec www /bin/ash
 ```
 Replace *php* with *www* and vice versa to open a shell in the php or nginx container.
 
-Open a shell in the MariaDB container.
+Open a shell in the MariaDB container:
 ```bash
 docker-compose exec db /bin/bash
 ```
 
+### Execute arbitrary commands in PHP container
+The `command.sh` wrapper script allows to execute any commands inside the php container in docker.
+
+E. g. show the installed php version:
+```bash
+./bin/command.sh php --version
+```
+
+Run a composer diagnose  and bypass the `composer.sh` wrapper:
+```bash
+./bin/command.sh composer diagnose
+```
+
+Call the Symfony console and bypass the `console-sf.sh` wrapper:
+```bash
+./bin/command.sh php ./bin/console --version
+./bin/command.sh php ./bin/console list
+./bin/command.sh php ./bin/console list doctrine
+```
+
+Call the Doctrine ORM module directly and bypass the `doctrine-zf.sh` wrapper:
+```bash
+./bin/command.sh ./vendor/bin/doctrine-module list
+./bin/command.sh ./vendor/bin/doctrine-module orm:schema-tool:update --dump-sql
+```
+
+
+## PHP extensions
+Following extensions are already installed:
+- mysqli
+- pdo-mysql
+- zip
+- bzip2
+- intl
+- Xdebug
+- OPcache
+- APCu
+
+Override the default settings by mounting your own `php.ini` file as `/usr/local/etc/php/php.ini` at runtime.
+The configuration for `Xdebug` is located in `/usr/local/etc/php/conf.d/xdebug.ini`.
+
+If you need more extensions (e. g. a module requires them), you could clone this
+alpine based PHP7-FPM docker image [on GitHub](https://github.com/florianzier/php-fpm-alpine)
+(visit on [Docker Hub](https://hub.docker.com/r/zierf/php/)) or use the
+[official php](https://hub.docker.com/_/php/) and build your own docker image.
+
+For further information how to install php extensions, see the "_How to install more PHP extensions_"
+and following sections in the official PHP documentation on Docker Hub.
+
+
+## Nginx Webserver
+
+Depending on whether you want to use SSL encryption, it's necessary to put the certificate and
+matching private key in the proper places.
+Also Consider to disable SSL encryption if you use the application behind a reverse proxy and let the proxy handle it.
+
+### Activate SSL
+In order to have an active encryption, copy your certificate file into the path `/conf/ssl/certs/nginx.crt`.
+The private key file should be copied to `/conf/ssl/private/nginx.key`.
+
+In case the filenames shouldn't be changed to nginx.*ext* or the file extensions is something else (e. g. *.pem*),
+it's needed to adjust the paths following paths in the `/conf/nginx.conf`:
+```
+    ssl_certificate     /etc/ssl/certs/nginx.crt;
+    ssl_certificate_key /etc/ssl/private/nginx.key;
+```
+
+### Disable SSL / Behind a reverse proxy
+Disabling SSL can be done by removing the first server block in `/conf/conf.d/vhost.conf`
+and changing the listen directives in the second one.
+```
+    listen        443 ssl http2 default_server;
+    listen   [::]:443 ssl http2 default_server ipv6only=on;
+```
+… will be replaced by …
+```
+    listen      80 default_server;
+    listen [::]:80 default_server ipv6only=on;
+```
+
+### Disable IPv6
+Simply remove the lines beginning with `listen [::]:…` in the `/conf/conf.d/vhost.conf` file.
+
+### Log files
+An `access.log` and `error.log` can be found in the `/logs/` subfolder after
+a successfully start of the application (and some requests).
+
+
+## MariaDB Server (MySQL)
+
+### Change MySQL passwords and database name
+There are some *MYSQL_*… environment variables to provide an initial database name, root password and username/password.
+You could provide them in the `.env` file in the project root, they will be handed over to the MariaDB container.
+For further information (available variables, alternative secrets file) see [Environment Variables / Docker Secrets](https://hub.docker.com/_/mariadb/) sections in the official MariaDB documentation on Docker Hub.
+
+### Initialize database with preset values
+It's possible to put some *.sql* scripts into the `/conf/initdb.d/` directory.
+This way initial database structures or existing dumps can be loaded.
+For further information (file extensions, execution order) see [Initializing a fresh instance](https://hub.docker.com/_/mariadb/)
+section in the official MariaDB documentation on Docker Hub.
+
 
 ## Symfony
-The `console-sf.sh` wrapper script allows to execute symfony commands as if you would directly call them with `php bin/console …` (see also [How to Use the Console](https://symfony.com/doc/3.4/console/usage.html)).
 
-Show Symfony version and environment.
+### Symfony console wrapper script
+The `console-sf.sh` wrapper script allows to execute symfony commands as if you would directly call them
+with `php bin/console …` (see also [How to Use the Console](https://symfony.com/doc/3.4/console/usage.html)).
+
+Show Symfony version and environment:
 ```bash
 ./bin/console-sf.sh --version
 ```
 
-Example to clear the development or production environment caches.
+Example to clear the development or production environment caches:
 ```bash
 ./bin/console-sf.sh cache:clear --no-warmup --env=dev
 ./bin/console-sf.sh cache:clear --no-warmup --env=prod
 ```
 
-Show a list of all routes
+Show a list of all routes:
 ```bash
 ./bin/console-sf.sh debug:router
 ```
@@ -253,10 +311,11 @@ Afterwards install and activate the *web-profiler toolbar* by installing the *pr
 ```bash
 ./bin/composer.sh require --dev profiler
 ```
-You can then configure the *web-profiler* in the `/www/config/packages/dev/web_profiler.yaml` file and enable/disable the toolbar any time by setting `web_profiler.toolbar: false`.
+You can then configure the *web-profiler* in the `/www/config/packages/dev/web_profiler.yaml` file
+and enable/disable the toolbar any time by setting `web_profiler.toolbar: false`.
 
 ### Install Doctrine ORM and update database
-Install *Doctrine ORM* in Symfony.
+Install *Doctrine ORM* in Symfony:
 ```bash
 ./bin/composer.sh require doctrine maker
 ```
@@ -270,11 +329,11 @@ The default hostname of the server is `db` (same as the service-name defined in 
 Username, password and name of the database should match the *MYSQL_*… environment variables in the `/.env` file
 (the one which can be found in project's main folder).
 
-List available doctrine commands (e. g. create entities, update schema, create migrations).
+List available doctrine commands (e. g. create entities, update schema, create migrations):
 ```bash
 ./bin/console-sf.sh list doctrine
 ```
-Example to create/update/validate database schema.
+Example to create/update/validate database schema:
 ```bash
 ./bin/console-sf.sh doctrine:schema:create
 ./bin/console-sf.sh doctrine:schema:update --force
@@ -282,26 +341,29 @@ Example to create/update/validate database schema.
 ./bin/console-sf.sh doctrine:schema:validate
 ```
 
-For further information see [Databases and the Doctrine ORM](https://symfony.com/doc/current/doctrine.html) in official Symfony documentation.
+For further information see [Databases and the Doctrine ORM](https://symfony.com/doc/current/doctrine.html)
+in official Symfony documentation.
 
 
 ## Zend
 
 ### Install Zend Developer Toolbar
-If you enable the developer toolbar with the following command (and after initializing the skeleton), make sure to choose
-`config/development.config.php.dist` as file to inject the *ZendDeveloperTools* into, so they will stay disabled later in production.
+If you enable the developer toolbar with the following command (and after initializing the skeleton),
+make sure to choose `config/development.config.php.dist` as file to inject the *ZendDeveloperTools* into,
+so they will stay disabled later in production.
 ```bash
 ./bin/composer.sh require --dev zendframework/zend-developer-tools
 ```
 
 ### Install Doctrine ORM and update database
-Install *Doctrine ORM* in Zend.
+Install *Doctrine ORM* in Zend:
 ```bash
 ./bin/composer.sh require doctrine/doctrine-orm-module
 ```
 Choose the `config/modules.config.php` as config file for injecting the new modules.
 
-It's necessary to provide at least a small and rudimentary doctrine configuration file, before you can use doctrine commands on your database.
+It's necessary to provide at least a small and rudimentary doctrine configuration file, before you can
+use doctrine commands on your database.
 Create a new file `/www/config/autoload/doctrine.global.php` with following content:
 ```php
 <?php
@@ -344,20 +406,24 @@ return [
 
 ```
 Most configuration lines are taken from the *Stack Overflow* post about [installing doctrine orm module with ZF3 skeleton app](https://stackoverflow.com/a/38210894).
-The hostname of the server connection url is again `db` and username, password and name of the database should match the *MYSQL_*… environment variables in the `/.env` file,
+The hostname of the server connection url is again `db` and username, password and name of the database
+should match the *MYSQL_*… environment variables in the `/.env` file,
 same as in the *Doctrine ORM* section in Symfony.
 
-List available doctrine commands (e. g. create entities, update and validate schema).
+### Zend doctrine-module wrapper
+There is also a wrapper for executing commands with the `doctrine-module` of Zend.
+
+List available doctrine commands (e. g. create entities, update and validate schema):
 ```bash
 ./bin/doctrine-zf.sh list
 ```
 
-Show basic information about all mapped entities.
+Show basic information about all mapped entities:
 ```bash
 ./bin/doctrine-zf.sh orm:info
 ```
 
-Example to create/update/validate database schema.
+Example to create/update/validate database schema:
 ```bash
 ./bin/doctrine-zf.sh orm:schema-tool:create
 ./bin/doctrine-zf.sh orm:schema-tool:update --force
@@ -365,32 +431,6 @@ Example to create/update/validate database schema.
 ./bin/doctrine-zf.sh orm:validate-schema
 ```
 
-
-## Execute an arbitrary command in php container
-The `command.sh` wrapper script allows to execute any commands inside the php container in docker.
-
-E. g. show the installed php version.
-```bash
-./bin/command.sh php --version
-```
-
-Run a composer diagnose  and bypass the `composer.sh` wrapper.
-```bash
-./bin/command.sh composer diagnose
-```
-
-Call the Symfony console and bypass the `console-sf.sh` wrapper.
-```bash
-./bin/command.sh php ./bin/console --version
-./bin/command.sh php ./bin/console list
-./bin/command.sh php ./bin/console list doctrine
-```
-
-Call the Doctrine ORM module directly and bypass the `doctrine-zf.sh` wrapper.
-```bash
-./bin/command.sh ./vendor/bin/doctrine-module list
-./bin/command.sh ./vendor/bin/doctrine-module orm:schema-tool:update --dump-sql
-```
 
 
 ## Notes
